@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Board Form</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+
+<div th:replace="layout/header::header"></div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>게시글 등록</h1>
+    </div>
+    <br>
+
+    <!-- ${...?} null 체크 : null인 경우 빈값 출력 -->
+    <input id="board_index" type="hidden" th:value="${board?.index}">
+
+    <table class="table">
+        <tr>
+            <th style="padding: 13px 0 0 15px;">게시판 선택</th>
+            <td>
+                <div class="pull-left">
+                    <select id="board_type" class="form-control input-sm">
+                        <option>--분류--</option>
+                        <option th:value="notice" th:selected="${board?.boardType?.name() == 'notice'}">공지사항</option>
+                        <option th:value="free" th:selected="${board?.boardType?.name() == 'free'}">자유게시판</option>
+                    </select>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <th style="padding: 13px 0 0 15px;">생성 날짜</th>
+            <td>
+                <input type="text" class="col-md-1 form-control input-sm" readonly="readonly"
+                       th:value="${board?.createdDate} ? ${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm')} : ${board?.createdDate}">
+            </td>
+        </tr>
+
+        <tr>
+            <th style="padding: 13px 0 0 15px;">제목</th>
+            <td>
+                <input id="board_title" type="text" class="col-md-1 form-control input-sm"
+                       th:value="${board?.title}">
+            </td>
+        </tr>
+
+        <tr>
+            <th style="padding: 13px 0 0 15px;">부제목</th>
+            <td>
+                <input id="board_sub_title" type="text" class="col-md-1 form-control input-sm"
+                       th:value="${board?.subTitle}">
+            </td>
+        </tr>
+
+        <tr>
+            <th style="padding: 13px 0 0 15px;">내용</th>
+            <td>
+                    <textarea id="board_content" type="text" class="col-md-1 form-control input-sm"
+                              maxlength="140" rows="7" style="height: 200px;" th:text="${board?.content}"></textarea>
+                <span class="help-block"></span>
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div class="pull-left">
+        <a href="/board/list" class="btn btn-default">목록으로</a>
+    </div>
+
+    <div class="pull-right">
+        <!-- index 없으면 작성 form이기 때문에 저장 버튼 활성화 -->
+        <button id="insert" th:if="!${board?.index}" type="button" class="btn btn-primary">저장</button>
+        <button id="update" th:if="${board?.index}" type="button" class="btn btn-info" >수정</button>
+        <button id="delete" th:if="${board?.index}" type="button" class="btn btn-danger">삭제</button>
+    </div>
+</div>
+
+<div th:replace="layout/footer::footer"></div>
+</body>
+</html>
