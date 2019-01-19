@@ -5,6 +5,7 @@ import com.community.web.repository.BoardRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -24,8 +25,9 @@ public class BoardService {
      * @return
      */
     public Page<Board> findBoardList(Pageable pageable) {
-        int pageNumber = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1; // page는 index 처럼 0부터 count
-        pageable = PageRequest.of(pageNumber, pageable.getPageSize());
+        int pageNumber = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
+
+        pageable = PageRequest.of(pageNumber, pageable.getPageSize(), new Sort(Sort.Direction.DESC, "index"));
 
         return boardRepository.findAll(pageable);
     }
