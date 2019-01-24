@@ -1,0 +1,26 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: google-client-id
+            client-secret: google-client-secret
+          facebook:
+            client-id: google-client-id
+            client-secret: google-client-secret
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+custom:
+  oauth2:
+    kakao:
+      client-id: REST API KEY
+
+logging:
+  level:
+    com:
+      community: debug
