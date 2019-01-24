@@ -238,7 +238,7 @@ public class User implements Serializable {
 
 ---
 
-5. OAuth2Provider
+4. OAuth2Provider
 
 - Spring security oauth가 제공하는 CommonOAuth2Provider 살펴보기
 
@@ -360,20 +360,22 @@ public enum CustomOAuth2Provider {
     KAKAO {
         @Override
         public ClientRegistration.Builder getBuilder(String registrationId) {
-            return getBuilder(registrationId, ClientAuthenticationMethod.POST, DEFAULT_LOGIN_REDIRECT_URL)
-                    .scope("profile")
-                    .authorizationUri("https://kauth.kakao.com/oauth/authorize")
-                    .tokenUri("https://kauth.kakao.com/oauth/token")
-                    .userInfoUri("https://kapi.kakao.com/v1/user/me")
-                    .userNameAttributeName("id")
-                    .clientName("Kakao");
+            ClientRegistration.Builder builder = getBuilder(registrationId, 
+                    ClientAuthenticationMethod.POST, DEFAULT_LOGIN_REDIRECT_URL);
+            builder.scope("profile");
+            builder.authorizationUri("https://kauth.kakao.com/oauth/authorize");
+            builder.tokenUri("https://kauth.kakao.com/oauth/token");
+            builder.userInfoUri("https://kapi.kakao.com/v1/user/me");
+            builder.userNameAttributeName("id");
+            builder.clientName("Kakao");
+            return builder;
         }
     };
 
     private static final String DEFAULT_LOGIN_REDIRECT_URL = "{baseUrl}/login/oauth2/code/{registrationId}";
 
     /**
-     * CustomOAuth2Provider enum
+     * CustomOAuth2Provider enum에서 사용할 수 있는 메서드
      * @param registrationId
      * @param method
      * @param redirectUri
@@ -387,7 +389,7 @@ public enum CustomOAuth2Provider {
         builder.redirectUriTemplate(redirectUri);
         return builder;
     }
-    
+
     /**
      * CustomOAuth2Provider enum 객체를 생성하기 위해서는 아래 abstract method를 구현해야함
      * 위 KAKAO enum 객체 또한 getBuilder를 구현하여 생성함
@@ -400,7 +402,7 @@ public enum CustomOAuth2Provider {
 
 ---
 
-4. 프로퍼티 추가 및 변경 (properties -> yaml)
+5. 프로퍼티 추가 및 변경 (properties -> yaml)
 
 ```yml
 spring:
@@ -433,12 +435,15 @@ logging:
 
 --- 
 
-5. SecurityConfig 생성하기
+6. SecurityConfig 생성하기
 
 기본 WebSecurity 설정 WebSecurityConfigurerAdapter class
 
 ```java
+package org.springframework.security.config.annotation.web.configuration;
+
 public abstract class WebSecurityConfigurerAdapter implements
+		WebSecurityConfigurer<WebSecurity> {
     // 생략
 
     protected void configure(HttpSecurity http) throws Exception {
@@ -462,7 +467,6 @@ package com.community.web.config;
 
 import com.community.web.domain.enums.SocialType;
 import com.community.web.oauth2.CustomOAuth2Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
@@ -486,7 +490,6 @@ import java.util.stream.Collectors;
  * 각 소셜 미디어 리소스 정보를 빈으로 등록
  * @EnableWebSecurity : 웹 시큐리티 기능 사용하겠다는 어노테이션, 그냥 붙이기만할 경우 자동설정 따라감
  */
-@Slf4j
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -538,7 +541,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * 시큐리 starter에서 자동 설정되지만 카카오도 설정하기 위해 추가
+     * 시큐리티 starter에서 자동 설정되지만 카카오도 설정하기 위해 추가
      * @param oAuth2ClientProperties
      * @param kakaoClientId
      * @return
@@ -547,7 +550,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public ClientRegistrationRepository clientRegistrationRepository(
             OAuth2ClientProperties oAuth2ClientProperties,
             @Value("${custom.oauth2.kakao.client-id}") String kakaoClientId) { // application.yml 에 설정한 kakao client-id를 불러옴
-        log.debug("kakao client key : {}", kakaoClientId);
 
         // 기본 제공 OAuth2 인증 정보 빌드한 결과를 List로 collect
         List<ClientRegistration> registrationList = oAuth2ClientProperties.getRegistration().keySet().stream()
@@ -603,7 +605,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 ---
 
-6. Login view 및 LoginController 생성
+7. Login view 및 LoginController 생성
 
 template/login.html
 
@@ -670,7 +672,7 @@ http://localhost:8080/login , http://localhost:8080/board/list 로 접속
 
 ---
 
-7. 어노테이션 기반으로 User 정보 불러오기
+8. 어노테이션 기반으로 User 정보 불러오기
 
 ```java
 /**
@@ -724,13 +726,14 @@ public class LoginController {
 
 따로 서비스 계층을 추가하지 않고 AOP를 통해 특정 파라미터 형식을 취하면 병렬적으로 User 객체에 인증된 User 정보를 가져오는 방법에 신경 쓸 필요도 없고 로직 복붙도 필요없다.
 
-AOP 구현 시 우리는 스프링 strategy  인터페이스 중 하나인 HandlerMethodArgumentResolver를 사용한다.
+AOP 구현 시 우리는 스프링 strategy 인터페이스 중 하나인 HandlerMethodArgumentResolver를 사용한다.
 
 - LoginController 변경
 
 ```java
 package com.community.web.controller;
 
+import com.community.web.annotation.SocialUser;
 import com.community.web.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -782,7 +785,6 @@ public class LoginController {
     //
     //        return "redirect:/board/list";
     //    }
-
 }
 ```
 
@@ -946,7 +948,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     /**
-     * 명명규칙이 타 소셜미디어와 다른 카카오 회원을 위한 메서드
+     * 카카오 회원을 위한 메서드
+     * token에서 가져온 정보를 User 객체로 매핑
      * @param map
      * @return
      */
@@ -984,6 +987,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 }
 ```
 
+![](kakao-policy.png)
+
 ---
 
 - authenticationToken 알아보기
@@ -1013,15 +1018,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(userArgumentResolver);
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(userArgumentResolver);
     }
 }
 ```
 
 ---
 
-8. 테스트
+9. 테스트
 
 - kakao로 로그인 후 h2-console과 카카오 개발자페이지를 확인하면 추가되있는 걸 볼 수 있다,
 
