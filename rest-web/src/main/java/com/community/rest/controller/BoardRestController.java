@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +42,28 @@ public class BoardRestController {
                 .withSelfRel());
 
         return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping
+    public ResponseEntity<String> postBoard(@RequestBody Board board) {
+        board.setCreatedDateNow();
+        boardRepository.save(board);
+
+        return new ResponseEntity<>("{}", HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{index}")
+    public ResponseEntity<String> updateBoard(@RequestBody Board board, @PathVariable Long index) {
+        Board persistBoard = boardRepository.getOne(index);
+        persistBoard.update(board);
+        boardRepository.save(persistBoard);
+
+        return ResponseEntity.ok("{}");
+    }
+
+    @DeleteMapping("/{index}")
+    public ResponseEntity<String> deleteBoard(@PathVariable Long index) {
+        boardRepository.deleteById(index);
+        return ResponseEntity.ok("{}");
     }
 }
