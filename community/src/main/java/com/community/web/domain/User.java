@@ -1,5 +1,6 @@
 package com.community.web.domain;
 
+import com.community.web.domain.enums.SocialType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,18 @@ public class User implements Serializable {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
+    // OAuth
+    private String principal; // <- 추가
+    private SocialType socialType; // <- 추가
+
     @Builder
-    public User(String name, String password, String email, LocalDateTime createdDate, LocalDateTime updatedDate) {
+    public User(String name, String password, String email, LocalDateTime createdDate, LocalDateTime updatedDate, String principal, SocialType socialType) {
         this.name = name;
         this.password = password;
         this.email = email;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
+        this.principal = principal;
+        this.socialType = socialType;
     }
 }
