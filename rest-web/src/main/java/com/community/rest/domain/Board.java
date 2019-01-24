@@ -25,7 +25,7 @@ public class Board implements Serializable {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    @OneToOne(fetch = FetchType.LAZY) // fetch: 가지고오다, EAGER: DB에서 조회 시 바로 User 객체를 가져옴, LAZY: 조회 후 객체를 사용할 시에 가져옴
+    @OneToOne(fetch = FetchType.EAGER) // <- EAGER 사용해야 한다
     private User user; // 실제 User 객체가 DB에 저장되는 것이 아닌 User의 index가 record에 저장된다.
 
     @Builder
