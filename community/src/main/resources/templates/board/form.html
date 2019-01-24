@@ -18,6 +18,8 @@
 
     <!-- ${...?} null 체크 : null인 경우 빈값 출력 -->
     <input id="board_index" type="hidden" th:value="${board?.index}">
+    <!-- board 생성 날짜 -->
+    <input id="board_create_date" type="hidden" th:value="${board?.createdDate}">
 
     <table class="table">
         <tr>
@@ -85,5 +87,69 @@
 </div>
 
 <div th:replace="layout/footer::footer"></div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+
+<script th:if="!${board?.index}">
+    // 글 작성의 경우
+    $("#insert").click(function() {
+        var insertData = {
+            title: $("#board_title").val(),
+            subTitle: $("#board_sub_title").val(),
+            content: $("#board_content").val(),
+            boardType: $(".board_type option:selected").val()
+        }
+
+        $.ajax({
+            url: "http://localhost:8081/api/boards",
+            type: "POST",
+            data: JSON.stringify(insertData),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(data) {
+            alert("저장 성공!");
+            location.href = "/board/list";
+        }).fail(function() {
+            alert("저장 실패!");
+        });
+    });
+</script>
+
+<script th:if="${board?.index}">
+    // 글 조회의 경우
+    $("#update").click(function() {
+        var updateData = {
+            title: $("#board_title").val(),
+            subTitle: $("#board_sub_title").val(),
+            content: $("#board_content").val(),
+            boardType: $("#board_type option:selected").val()
+        }
+
+        $.ajax({
+            url: "http://localhost:8081/api/boards/" + $("#board_index").val(),
+            type: "PUT",
+            data: JSON.stringify(updateData),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(data) {
+            alert("수정 성공!");
+            location.href = "/board/list";
+        }).fail(function() {
+            alert("수정 실패!");
+        });
+    });
+
+    $("#delete").click(function() {
+        $.ajax({
+            url: "http://localhost:8081/api/boards/" + $("#board_index").val(),
+            type: "DELETE",
+        }).done(function(data) {
+            alert("삭제 성공!");
+            location.href = "/board/list";
+        }).fail(function() {
+            alert("삭제 실패!");
+        });
+    });
+</script>
 </body>
 </html>
