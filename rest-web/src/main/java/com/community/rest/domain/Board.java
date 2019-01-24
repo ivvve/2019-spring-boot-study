@@ -28,6 +28,24 @@ public class Board implements Serializable {
     @OneToOne(fetch = FetchType.EAGER) // <- EAGER 사용해야 한다
     private User user; // 실제 User 객체가 DB에 저장되는 것이 아닌 User의 index가 record에 저장된다.
 
+    /************
+     * 추가 됨  *
+     ************/
+    public void setCreatedDateNow() {
+        this.createdDate = LocalDateTime.now();
+    }
+
+    /************
+     * 추가 됨  *
+     ************/
+    public void update(Board board) {
+        this.title = board.getTitle();
+        this.subTitle = board.getSubTitle();
+        this.content = board.getContent();
+        this.boardType = board.getBoardType();
+        this.updatedDate = LocalDateTime.now();
+    }
+
     @Builder
     public Board(String title, String subTitle, String content, BoardType boardType, LocalDateTime createdDate, LocalDateTime updatedDate, User user) {
         this.title = title;
