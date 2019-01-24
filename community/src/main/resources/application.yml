@@ -14,6 +14,11 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+  datasource: # <- 추가
+    url: jdbc:h2:tcp://localhost:8010/mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
 
 custom:
   oauth2:
