@@ -49,7 +49,10 @@ https://developers.facebook.com/
 
 ![](oauth-facebook6.png)
 
-### HTTPS 만 됨
+
+개발 시에는 해당 redirection url을 적용하지 않아도 된다.
+
+![](oauth-facebook7.png)
 
 - 구글
 

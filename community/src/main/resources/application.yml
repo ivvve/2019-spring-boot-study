@@ -14,8 +14,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-  datasource: # <- 추가
-    url: jdbc:h2:tcp://localhost:8010/mem:testdb
+  datasource:
+    url: jdbc:h2:tcp://localhost:8011/mem:testdb
     driverClassName: org.h2.Driver
     username: sa
     password:
@@ -23,7 +23,7 @@ spring:
 custom:
   oauth2:
     kakao:
-      client-id: REST API KEY
+      client-id: db0a86ebabc86d824d6227d4b3562af4
 
 logging:
   level:

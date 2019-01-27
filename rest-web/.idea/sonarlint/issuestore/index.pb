@@ -19,3 +19,7 @@ l
 <src/main/java/com/community/rest/domain/enums/BoardType.java,a\d\ad448eabaa26d2ef907693dd556df726bd82da22
 e
 5src/main/java/com/community/rest/RestApplication.java,a\8\a835e7f4f488a5d82a5dedfc9510b33b8fdcea2c
+n
+>src/main/java/com/community/rest/config/WebSecurityConfig.java,9\f\9f1cc52b7782ac9143990f868c1b1980a463815d
+g
+7src/main/java/com/community/rest/config/H2DBConfig.java,d\5\d5292b29d96307ddb0650cff1d497c20814796cd
