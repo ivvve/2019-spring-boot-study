@@ -533,7 +533,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout() // 로그아웃에 대한 설정
                     .logoutUrl("/logout") // 로그아웃이 수행될 URL
                     .logoutSuccessUrl("/") // 성공 시 포워딩될 URI
-                    .deleteCookies("JESSIONID") // JSESSIONID 삭제
+                    .deleteCookies("JSESSIONID") // JSESSIONID 삭제
                     .invalidateHttpSession(true) // 세션 invalidate
             .and()
                 .addFilterBefore(filter, CsrfFilter.class) // 문자 인코딩 필터 전에 CsrfFilter 적용
