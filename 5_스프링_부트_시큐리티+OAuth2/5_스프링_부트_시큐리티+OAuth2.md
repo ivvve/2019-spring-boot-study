@@ -417,8 +417,8 @@ spring:
             client-id: google-client-id
             client-secret: google-client-secret
           facebook:
-            client-id: google-client-id
-            client-secret: google-client-secret
+            client-id: facebook-client-id
+            client-secret: facebook-client-secret
   jpa:
     properties:
       hibernate:
