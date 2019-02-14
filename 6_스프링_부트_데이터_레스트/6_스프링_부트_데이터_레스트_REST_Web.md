@@ -52,9 +52,20 @@ dependencies {
 }
 ```
 
-server port 8081로 설정
-```
-server.port=8081
+application.yml
+
+port, DB 설정
+
+```yaml
+server:
+    port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost:8082,/mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
 ```
 
 - 필요한 class 생성 (enums, domain, repository)
@@ -283,7 +294,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();\
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
         // CorsConfiguration.ALL : CORS에서 Origin, Method, Header 별로 허용 값을 설정, ALL = *
         corsConfiguration.addAllowedOrigin(CorsConfiguration.ALL);
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
@@ -306,7 +317,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-- 테스트용 데이터 추가
+- 테스트용 데이터 추가 (기존 community project의 CommandLineRunner는 삭제한다.)
 
 ```java
 package com.community.rest;
@@ -328,34 +339,34 @@ import java.util.stream.IntStream;
 @SpringBootApplication
 public class RestApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(RestApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(RestApplication.class, args);
+    }
 
-	@Bean
-	public CommandLineRunner commandLineRunner(UserRepository userRepository, BoardRepository boardRepository) {
-		return arg -> {
-			User chris = userRepository.save(User.builder()
-					.name("Chris")
-					.password("test1234!@")
-					.email("chris@naver.com")
-					.createdDate(LocalDateTime.now())
-					.build());
+    @Bean
+    public CommandLineRunner commandLineRunner(UserRepository userRepository, BoardRepository boardRepository) {
+        return arg -> {
+            User chris = userRepository.save(User.builder()
+                    .name("Chris")
+                    .password("test1234!@")
+                    .email("chris@naver.com")
+                    .createdDate(LocalDateTime.now())
+                    .build());
 
-			// Paging을 위해 200개의 데이터를 넣는다.
-			IntStream.rangeClosed(1, 154).forEach(index ->
-				boardRepository.save(Board.builder()
-						.title("게시글" + index)
-						.subTitle("순서" + index)
-						.content("테스트" + index)
-						.boardType(BoardType.free)
-						.createdDate(LocalDateTime.now())
-						.updatedDate(LocalDateTime.now())
-						.user(chris)
-						.build())
-			);
-		};
-	}
+            // Paging을 위해 154개의 데이터를 넣는다.
+            IntStream.rangeClosed(1, 154).forEach(index ->
+                boardRepository.save(Board.builder()
+                        .title("게시글" + index)
+                        .subTitle("순서" + index)
+                        .content("테스트" + index)
+                        .boardType(BoardType.free)
+                        .createdDate(LocalDateTime.now())
+                        .updatedDate(LocalDateTime.now())
+                        .user(chris)
+                        .build())
+            );
+        };
+    }
 }
 ```
 
@@ -398,7 +409,10 @@ public class Board implements Serializable {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    @OneToOne(fetch = FetchType.LAZY) // fetch: 가지고오다, EAGER: DB에서 조회 시 바로 User 객체를 가져옴, LAZY: 조회 후 객체를 사용할 시에 가져옴
+    /************
+     * 변경 됨  *
+     ************/
+    @OneToOne(fetch = FetchType.EAGER) // <- EAGER 사용해야 한다 : https://stackoverflow.com/questions/24994440/no-serializer-found-for-class-org-hibernate-proxy-pojo-javassist-javassist
     private User user; // 실제 User 객체가 DB에 저장되는 것이 아닌 User의 index가 record에 저장된다.
 
     /************
@@ -506,27 +520,4 @@ public class BoardRestController {
 
 ---
 
-## H2 DB 연동하기
-
-- REST server에 H2 DB 서버 설정
-
-```java
-package com.community.rest.config;
-
-import org.h2.tools.Server;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.sql.SQLException;
-
-@Configuration
-public class H2DBConfig {
-    
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public Server h2() throws SQLException {
-        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "8010");
-    }
-}
-```
-
-- CRUD 체크 하기
+- 8080 서버 (community 서버)에서 CRUD 체크 하기
