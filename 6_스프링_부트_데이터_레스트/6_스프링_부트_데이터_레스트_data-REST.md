@@ -459,6 +459,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 }
 ```
 
+@JsonIgnore 지우고
+
 서버 재기동 후 재접속 http://localhost:8081/api/users
 
 ![](6_08.png)
@@ -526,6 +528,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     InMemoryUserDetailsManager userDetailsManager() {
+        // org.springframework.security.core.userdetails.User
         User.UserBuilder commonUser = User.withUsername("commonUser") // domain의 user가 아님!
                 .password("{noop}common")
                 .roles("USER");
@@ -571,21 +574,7 @@ $("#insert").click(function() {
 });
 ```
 
-RestApplication에서 boardRepository를 사용한 코드 주석으로 변경 (권한 걸려있어서 실행되지 않음)
-
-```java
-// Paging을 위해 154개의 데이터를 넣는다.
-// IntStream.rangeClosed(1, 154).forEach(index ->
-//     boardRepository.save(Board.builder()
-//         .title("게시글" + index)
-//         .subTitle("순서" + index)
-//         .content("테스트" + index)
-//         .boardType(BoardType.free)
-//         .createdDate(LocalDateTime.now())
-//         .updatedDate(LocalDateTime.now())
-//         .user(chris)
-//         .build()));
-```
+서버 재기동 후 글 작성 테스트
 
 ---
 
@@ -678,9 +667,26 @@ public class RestApplicationTests {
         return restTemplate.getForObject(updateUri, Board.class);
     }
 
-
 }
 ```
+
+테스트를 위해 ddl-auto를 create-drop으로 변경
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost:8082,/mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+```
+
+테스트 후 validate로 바꿔놓는다.
+
 
 ---
 
@@ -723,6 +729,10 @@ http://localhost:8081/api/boards/search/findByTitle?title=TestTitle (미리 해�
 @RestResource(path = "query")
 List<Board> findByTitle(@Param("title") String title);
 ```
+
+http://localhost:8081/api/boards/search/query?title=TestTitle (미리 해당 제목의 board data가 있어야한다.)
+
+---
 
 특정 repository, 쿼리 메서드, 필드를 노출하고 싶지 않은 상황이 있다.
 
