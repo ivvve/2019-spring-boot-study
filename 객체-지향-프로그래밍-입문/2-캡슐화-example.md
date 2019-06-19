@@ -141,3 +141,15 @@ public class Member {
     }
 }
 ```
+
+```java
+public void verifyEmail(String token) {
+    Member member = findByToken(token);
+
+    if (member == null) {
+        throw new BadTokenException();
+    }
+
+    member.verifyEmail();
+}
+```
