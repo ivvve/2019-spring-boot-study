@@ -88,7 +88,7 @@ public class Timer {
         switch (timeUnit) {
             case SECONDS:
                 return (this.endTime - this.startTime) / 1_000;
-            case MICROSECONDS:
+            case MILLISECONDS:
                 return this.endTime - this.startTime;
             // ...
         }

@@ -28,7 +28,7 @@ public class CloudFileManager {
     public List<FileInfo> getFileInfos(CloudId cloudId) {
         if (cloudId == CloudId.DROPBOX) {
             DropboxClient dbClient = getDropboxClient(...);
-            List<DbFile> dbFiles = dbClient.getFiles();
+            List<DropboxFile> dbFiles = dbClient.getFiles();
 
             return dbFiles.stream()
                     .map(FileInfo::new)
@@ -314,7 +314,7 @@ public class DropboxFileSystem implements CloudFileSystem {
 
     @Override
     public List<CloudFile> getFiles() {
-        List<DbFile> dbFiles = dbClient.getFiles();
+        List<DropboxFile> dbFiles = dbClient.getFiles();
 
         return dbFiles.stream()
                 .map(dbFile -> new DropboxCloudFile(dbFile, dbClient))
@@ -325,10 +325,10 @@ public class DropboxFileSystem implements CloudFileSystem {
 
 ```java
 public class DropboxCloudFile implements CloudFile {
-    private DbFile dbFile;
+    private DropboxFile dbFile;
     private DropboxClient dbClient;
 
-    public DropboxCloudFile(DbFile dbFile, DropboxClient dbClient) {
+    public DropboxCloudFile(DropboxFile dbFile, DropboxClient dbClient) {
         this.dbFile = dbFile;
         this.dbClient = dbClient;
     }
@@ -410,7 +410,7 @@ public class CloudFileManager {
 
 ```java
 public class DropboxCloudFile implements CloudFile {
-    private DbFile dbFile;
+    private DropboxFile dbFile;
     private DropboxClient dbClient;
 
     @Override
@@ -424,7 +424,7 @@ public class DropboxCloudFile implements CloudFile {
 }
 
 public class GoogleDriveCloudFile implements CloudFile {
-    private GoogleCloudClient gcClient = getGcClient(...);
+    private GoogleDriveClient gcClient = getGcClient(...);
 
     @Override
     public void copyFrom(CloudFile file) {
